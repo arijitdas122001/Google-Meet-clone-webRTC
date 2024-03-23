@@ -23,4 +23,12 @@ io.on('connection', (socket) => {
     socket.on('call:accepted',({to,ans})=>{
       io.to(to).emit('call:accepted',{from:socket.id,ans});
     });
-  }); 
+    socket.on('peer:nego:needed',({to,offer})=>{
+      // console.log("peer:nego:needed",offer);
+      io.to(to).emit('peer:nego:needed',{from:socket.id,offer});
+    })
+    socket.on('peer:nego:done',({to,answer})=>{
+      // console.log("peer:nego:final",answer);
+      io.to(to).emit('peer:nego:final',{from:socket.id,answer});
+    })
+  });   
