@@ -54,7 +54,7 @@ const videoPage = () => {
   const handelNegoSecondUser=useCallback(async({from,offer})=>{
     const answer=await PeerConnection.getAnswer(offer);
     socket.emit('peer:nego:done',{to:from,answer});
-  },[]);
+  },[socket]);
   useEffect(()=>{
     PeerConnection.peer.addEventListener('negotiationneeded',handelNegoNeed);
     return(()=>{
@@ -62,7 +62,7 @@ const videoPage = () => {
     })
   },[handelNegoNeed]);
   const handelFinalNego=useCallback(async({answer})=>{
-    console.log("answer",answer)
+    // console.log("answer",answer)
     await PeerConnection.setLDescription(answer);
   },[])
   useEffect(()=>{ 
