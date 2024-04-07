@@ -13,7 +13,7 @@ const Landing = () => {
     socket.emit("room:join",{email,code});
   },[email,code,socket]);
   const handelRoomData=useCallback((data)=>{
-    const {email,code}=data;  
+    const {email,code}=data;   
     navigate(`/call/${code}`);
   },[])
   useEffect(()=>{

@@ -10,6 +10,7 @@ const videoPage = () => {
   const [RemoteSocketId,setRemoteSocketId]=useState(null);
   const [MyStream,setMyStream]=useState();
   const [RemoteStream,setRemoteStream]=useState();
+  const [finalnego,setfinalnego]=useState(false);
   const handelSecondUserData=useCallback((data)=>{
     const {email,socketId}=data;
     setRemoteSocketId(socketId);
@@ -23,6 +24,7 @@ const videoPage = () => {
     // console.log(offer);
     socket.emit("user:call",{to:RemoteSocketId,offer});
     setMyStream(stream);
+    // console.log("streaming");
   },[socket,RemoteSocketId]);
   const handelIncomingCall=useCallback(async(data)=>{
     const {from,offer}=data;
@@ -63,6 +65,7 @@ const videoPage = () => {
   },[handelNegoNeed]);
   const handelFinalNego=useCallback(async({answer})=>{
     // console.log("answer",answer)
+    setfinalnego(true);
     await PeerConnection.setLDescription(answer);
   },[])
   useEffect(()=>{ 
@@ -88,19 +91,30 @@ const videoPage = () => {
       socket.off('peer:nego:final',handelFinalNego);
     };
   },[socket,handelIncomingCall,handelSecondUserData,handelAcceptCall,handelNegoNeed,handelFinalNego]);
+  const [Rmute,setRMute]=useState(false);
+  const [Mmute,setMMute]=useState(false);
+  const handelRMute=()=>{
+    setRMute(!Rmute);
+  }
+  const handelMMute=()=>{
+    setMMute(!Mmute);
+  }
   return (
     <div>
       <h1>RoomCode is {id}</h1>
-      <h2>{RemoteSocketId?"Connected":"No one in the Room"}</h2>
-      <button onClick={handelCallUser}>Join</button>
-      {MyStream && <button onClick={SendStreams}>Call</button>}
-      {RemoteSocketId && <ReactPlayer height={200} width={200} url={MyStream} playing={true} />}
-      <h2>RemoteStreams</h2>
+      {!finalnego && <div>
+      <h2>{RemoteSocketId?"user Entered in the room":"No one in the Room"}</h2>
+      {RemoteSocketId && !finalnego && <button onClick={handelCallUser}>Request User to join</button>}
+      {MyStream && <button onClick={SendStreams}>{RemoteStream?"Accept The call":"Join the interview"}</button>}
+      </div>}
+      <button onClick={handelMMute}>Mute</button>
+      <ReactPlayer height={200} width={200} url={MyStream} playing={true} muted={Mmute} />
+      <h2>RemoteStream</h2>
+      <button onClick={handelRMute}>Mute</button>
       {RemoteStream && 
-      <ReactPlayer height={200} width={200} url={RemoteStream} playing={true} />
+      <ReactPlayer height={200} width={200} url={RemoteStream} playing={true} muted={Rmute} />
       }
     </div>
   )
 }
-
 export default videoPage
